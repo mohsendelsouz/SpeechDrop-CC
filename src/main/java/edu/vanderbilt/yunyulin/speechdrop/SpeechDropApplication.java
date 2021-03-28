@@ -115,7 +115,7 @@ public class SpeechDropApplication {
             if (roomName == null || roomName.length() == 0 || roomName.length() > 60) {
                 redirect(ctx, "/");
             } else {
-                Room r = roomHandler.makeRoom(roomName);
+                Room r = roomHandler.makeRoom(roomName, null);
                 redirect(ctx, "/" + r.getId());
             }
         });
@@ -225,20 +225,22 @@ public class SpeechDropApplication {
         } else {
             mediaUrl = config.getString("mediaUrl");
         }
-        router.route("/:roomid").method(GET).handler(ctx -> {
+        router.route("/:roomid/:roomName").method(GET).handler(ctx -> {
             String roomId = ctx.request().getParam("roomid");
+            String roomName = ctx.request().getParam("roomName");
+            Room r;
             if (!roomHandler.roomExists(roomId)) {
-                redirect(ctx, "/");
+                r = roomHandler.makeRoom(roomName, roomId);
             } else {
-                Room r = roomHandler.getRoom(roomId);
-                r.getIndex().setHandler(ar -> ctx.response().putHeader(CONTENT_TYPE, TEXT_HTML)
-                        .end(roomTemplate
-                                .replace("{% MEDIA_URL %}", mediaUrl)
-                                .replace("{% INDEX %}", ar.result())
-                                .replace("{% ROOM %}", r.getId())
-                                .replace("{% NAME %}",
-                                        HTML_ESCAPER.escape(r.getData().name))));
+                r = roomHandler.getRoom(roomId);
             }
+            r.getIndex().setHandler(ar -> ctx.response().putHeader(CONTENT_TYPE, TEXT_HTML)
+                    .end(roomTemplate
+                            .replace("{% MEDIA_URL %}", mediaUrl)
+                            .replace("{% INDEX %}", ar.result())
+                            .replace("{% ROOM %}", r.getId())
+                            .replace("{% NAME %}",
+                                    HTML_ESCAPER.escape(r.getData().name))));
         });
     }
 }

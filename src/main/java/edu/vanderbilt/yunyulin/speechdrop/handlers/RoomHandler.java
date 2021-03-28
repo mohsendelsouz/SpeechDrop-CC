@@ -73,15 +73,14 @@ public class RoomHandler {
         return dataStore.containsKey(id);
     }
 
-    public Room makeRoom(String name) {
-        String newId = null;
-        while (newId == null || roomExists(newId)) {
-            newId = nextSessionId();
+    public Room makeRoom(String name, String roomId) {
+        while (roomId == null || roomExists(roomId)) {
+            roomId = nextSessionId();
         }
-        dataStore.put(newId, new RoomData(name, System.currentTimeMillis()));
-        LOGGER.info("[" + newId + "] Created room with name " + name);
+        dataStore.put(roomId, new RoomData(name, System.currentTimeMillis()));
+        LOGGER.info("[" + roomId + "] Created room with name " + name);
         writeRooms();
-        return getRoom(newId);
+        return getRoom(roomId);
     }
 
     public Room getRoom(String id) {
