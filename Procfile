@@ -1,0 +1,1 @@
+web: java -Dfile.encoding=UTF-8 -jar target/SpeechDrop-1.0-SNAPSHOT.jar -conf config.json
